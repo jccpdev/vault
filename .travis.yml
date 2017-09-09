@@ -16,6 +16,6 @@ before_script:
   - mv vault /home/travis/bin/vault
 
 script:
-  - php composer install
-  - php ./vendor/bin/phpunit -c phpunit.xml
+  - composer install
+  - ./vendor/bin/phpunit -c phpunit.xml
 
