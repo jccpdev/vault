@@ -145,7 +145,7 @@ class VaultClientTest extends TestCase
      * @param $body
      * @param $expectedData
      */
-    protected function setRequestMocks($method = 'POST', $path, $body, $expectedData): void
+    protected function setRequestMocks($method = 'POST', $path, $body, $expectedData)
     {
         $this->clientMock->shouldReceive('request')
             ->with($method,
