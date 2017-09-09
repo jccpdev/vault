@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/fliglio/vault.svg?branch=master)](https://travis-ci.org/fliglio/vault)
-[![Latest Stable Version](https://poser.pugx.org/fliglio/vault/v/stable.svg)](https://packagist.org/packages/fliglio/vault)
+[![Build Status](https://travis-ci.org/jccpdev/vault.svg?branch=master)](https://travis-ci.org/jccpdev/vault)
 
 # Vault SDK
 
@@ -29,10 +28,12 @@ The default client will leverage the environment variables `VAULT_ADDR` and `VAU
 		"baz" => "boo",
 	];
 
-	$c = new Client();
+	$config = new DefaultVaultConfig('http://localhost:8200', new Tokens('horde'), '');
 
-	$resp = $c->write('secret/testing', $secrets);
-	$found = $c->read('secret/testing');
+    $vaultClient = new VaultClient(new Client());
+    $vaultClient->withConfig($config);
+    $vaultClient->write('secret/testing', $secrets);
+    $found = $vaultClient->read('secret/testing');
 
 	print_r($found['data']);
 	
@@ -52,13 +53,17 @@ The default client will leverage the environment variables `VAULT_ADDR` and `VAU
 		"baz" => "boo",
 	];
 
-	$c = new Client(new DefaultConfigFactory([
-		'auth' => new AppRole($roleId, $secretId),
-	]));
-
-	$resp = $c->write('secret/testing', $secrets);
-	$found = $c->read('secret/testing');
-
+    $vaultClient = new VaultClient(new Client());
+    
+    $auth = new AppRole($vaultClient);
+    $auth->with('theRoleId', 'theSecretId');
+    
+    $config = new DefaultVaultConfig('http://localhost:8200', $auth, '');
+    
+    $vaultClient->withConfig($config);
+    $vaultClient->write('secret/testing', $secrets);
+    
+    $found = $vaultClient->read('secret/testing');
 	print_r($found['data']);
 	
 	// Output:
