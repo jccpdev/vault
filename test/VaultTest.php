@@ -7,7 +7,6 @@ use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
 use Vault\Auth\Tokens;
 use Vault\DefaultVaultConfig;
-use Vault\VaultConfig;
 use Vault\VaultClient;
 
 class VaultTest extends TestCase
