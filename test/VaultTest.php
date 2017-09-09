@@ -1,65 +1,60 @@
 <?php
 
-namespace Fliglio\Vault;
+namespace Tests;
 
 
-use Fliglio\Vault\Auth\AppRole;
+use GuzzleHttp\Client;
+use PHPUnit\Framework\TestCase;
+use Vault\Auth\Tokens;
+use Vault\DefaultVaultConfig;
+use Vault\VaultConfig;
+use Vault\VaultClient;
 
-class VaultTest extends \PHPUnit_Framework_TestCase {
-	
-	private $pid;
+class VaultTest extends TestCase
+{
 
-	public function setup() {
+    private $pid;
 
-		$cmd = "vault server -dev -dev-root-token-id=horde";
-		exec(sprintf("%s >/dev/null 2>&1 & echo $!", $cmd), $out);
+    public function setup()
+    {
 
-		$this->pid = $out[0];
-		usleep(100000);
-	}
+        $cmd = "vault server -dev -dev-root-token-id=horde";
+        exec(sprintf("%s >/dev/null 2>&1 & echo $!", $cmd), $out);
 
-	public function teardown() {
-		posix_kill(intval($this->pid), 9);
-	}
+        $this->pid = $out[0];
+        usleep(100000);
+    }
 
-	public function testDefaultConfig() {
-		$cfg = (new DefaultVaultConfigFactory())->getConfig();
+    public function teardown()
+    {
+        posix_kill(intval($this->pid), 9);
+    }
 
-		$this->assertEquals($cfg->getAddr(), "http://localhost:8200");
-		$this->assertEquals(get_class($cfg->getHttp()), "GuzzleHttp\Client");
-		$this->assertEquals(get_class($cfg->getAuth()), "Fliglio\Vault\Auth\Tokens");
-		$this->assertEquals($cfg->getAuth()->getToken(new VaultClient()), "horde");
-	}
+    public function testDefaultConfig()
+    {
+        $cfg = new DefaultVaultConfig('http://localhost:8200', new Tokens('horde'), '');
 
-	public function testAppRoleAuth() {
-		$c = new VaultClient();
-		$resp = $c->authDisable('approle');
-		$resp = $c->authEnable('approle');
-		$resp = $c->authDisable('approle');
-		$resp = $c->authEnable('approle');
-	}
-	/**
-	 * @expectedException \Exception
-	 */
-	public function testAppRoleAuthExists() {
-		$c = new VaultClient();
-		$resp = $c->authEnable('approle');
-		$resp = $c->authEnable('approle');
-	}
+        $this->assertEquals($cfg->getAddress(), "http://localhost:8200");
+        $this->assertInstanceOf(Tokens::class, $cfg->getAuthentication());
+        $this->assertEquals($cfg->getAuthentication()->getToken(), "horde");
+    }
 
-	public function testSecrets() {
-		// given
-		$secrets = [
-			"foo" => "bar",
-			"baz" => "boo",
-		];
-		
-		// when
-		$c = new VaultClient();
+    public function testSecrets()
+    {
+        // given
+        $secrets = [
+            "foo" => "bar",
+            "baz" => "boo",
+        ];
 
-		$resp = $c->write('secret/testing', $secrets);
-		$found = $c->read('secret/testing');
-		// then
-		$this->assertEquals($secrets, $found['data'], "read secrets should match written secrets");
-	}
+
+        // when
+        $config = new DefaultVaultConfig('http://localhost:8200', new Tokens('horde'), '');
+        $vaultClient = new VaultClient(new Client());
+        $vaultClient->withConfig($config);
+        $vaultClient->write('secret/testing', $secrets);
+        $found = $vaultClient->read('secret/testing');
+                // then
+        $this->assertEquals($secrets, $found['data'], "read secrets should match written secrets");
+    }
 }
