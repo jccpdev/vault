@@ -72,3 +72,6 @@ The default client will leverage the environment variables `VAULT_ADDR` and `VAU
 	//     [baz] => boo
 	//     [foo] => bar
 	// )
+
+### Credit
+This is a fork of https://github.com/fliglio/vault

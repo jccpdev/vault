@@ -6,10 +6,6 @@
         {
             "name": "Juan Contreras",
             "email": "jc@jccp.me"
-        },
-        {
-            "name": "Ben Schwartz",
-            "email": "benschw@gmail.com"
         }
     ],
     "minimum-stability": "stable",
