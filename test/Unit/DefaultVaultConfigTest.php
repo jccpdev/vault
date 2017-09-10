@@ -28,4 +28,17 @@ class DefaultVaultConfigTest extends TestCase
 
     }
 
+    public function test_config_can_be_build_with_hostname_as_optional()
+    {
+        $address = 'theAddress';
+        $auth = new Tokens('theToken');
+
+        $config = new DefaultVaultConfig($address, $auth);
+
+        $this->assertEquals($address, $config->getAddress());
+        $this->assertEquals($auth, $config->getAuthentication());
+        $this->assertNull($config->getHostName());
+
+    }
+
 }

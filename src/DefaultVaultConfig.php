@@ -11,7 +11,7 @@ class DefaultVaultConfig implements VaultConfig
     private $authentication;
     private $hostName;
 
-    public function __construct($address, Auth $auth, $hostName)
+    public function __construct($address, Auth $auth, $hostName = null)
     {
         $this->address = $address;
         $this->authentication = $auth;
